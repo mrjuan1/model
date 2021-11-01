@@ -32,7 +32,8 @@ $(O): $(OBJS)
 %.o: %.c
 	$(CC) -c $< -o $@ $(CFLAGS_DEBUG) $(CFLAGS)
 
-run: indexed-$(MODEL).bin
+run: $(O) $(MODEL).bin
+	./$^
 
 debug: $(O) $(MODEL).bin
 	$(GDB) -ex run --batch --args ./$^
@@ -56,7 +57,7 @@ indexed-$(MODEL).bin: $(O) $(MODEL).bin
 
 help:
 	@echo "all - Build executable and export/convert $(MODEL)"
-	@echo "clean - Remove executable, object(s) and all exported/converted model(s) directory"
+	@echo "clean - Remove executable, object(s) and all exported/converted model(s)"
 	@echo "distclean - Remove everything in .gitignore"
 	@echo "$(O) - Build $(O)"
 	@echo "<object>.o - Build <object>.o"
@@ -64,6 +65,6 @@ help:
 	@echo "debug - Run executable with gdb"
 	@echo "release - Build optimised executable"
 	@echo "dist - Package optimised executable and all local dependencies in a dist directory"
-	@echo "$(MODEL).blend - Copy Blender model to this directory"
+	@echo "$(MODEL).blend - Copy Blender model from parrent directory to this directory"
 	@echo "$(MODEL).bin - Export vertex data from $(MODEL).blend"
-	@echo "indexed-$(MODEL).bin - Convert exported model vertex data to indexed vertex data"
+	@echo "indexed-$(MODEL).bin - Convert exported vertex data to indexed vertex data"

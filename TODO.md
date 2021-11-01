@@ -1,4 +1,5 @@
 # TODO
 
-- [ ] Add conversion messages
-- [ ] Add proper error-checking
+- [x] Add conversion messages
+- [x] Add proper error-checking
+- [x] Write README

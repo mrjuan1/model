@@ -231,6 +231,8 @@ int main(int argc, const char *argv[]) {
 		printf("done.\n");
 	}
 
+	printf("\nDone.\n");
+
 	return 0;
 }
 

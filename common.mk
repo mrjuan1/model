@@ -65,6 +65,6 @@ help:
 	@echo "debug - Run executable with gdb"
 	@echo "release - Build optimised executable"
 	@echo "dist - Package optimised executable and all local dependencies in a dist directory"
-	@echo "$(MODEL).blend - Copy Blender model from parrent directory to this directory"
+	@echo "$(MODEL).blend - Copy Blender model from parent directory to this directory"
 	@echo "$(MODEL).bin - Export vertex data from $(MODEL).blend"
 	@echo "indexed-$(MODEL).bin - Convert exported vertex data to indexed vertex data"

@@ -42,7 +42,7 @@ For more `make` options, run `make help`.
 
 For executable usage, you can run `./model --help`.
 
-This project needs at least one triangulated and UV-mapped mesh object with a single UV map. The object, its mesh and its UV map all need to have the same name. Once this is prepared, either place the `.blend` file in this directory or in this directory's parent directory. Next, update `export.py` and `common.mk` to make use of the new model and its name.
+This project needs at least one triangulated and UV-mapped mesh object with a single UV map. The object, its mesh and its UV map all need to have the same name. Once this is prepared, either place the `.blend` file in this directory or in this directory's parent directory. Next, update `common.mk` to make include the new model and its name.
 
 [Back to top](#model)
 

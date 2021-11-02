@@ -2,7 +2,7 @@ O := model
 SRCS := $(O).c
 OBJS := $(SRCS:%.c=%.o)
 
-MODEL := camera
+MODELS := quad.bin camera.bin
 
 CC := $(CROSS_COMPILE)gcc
 STRIP := $(CROSS_COMPILE)strip
@@ -18,7 +18,7 @@ CFLAGS_RELEASE := $(CFLAGS_COMMON)
 CFLAGS_RELEASE += -Ofast
 CFLAGS_RELEASE += -ftree-vectorize -ffast-math -funroll-loops
 
-all: $(O) $(MODEL).blend $(MODEL).bin indexed-$(MODEL).bin
+all: $(O) indexed-quad.bin indexed-camera.bin
 
 clean:
 	@rm -Rfv $(O) *.o *.bin
@@ -32,10 +32,10 @@ $(O): $(OBJS)
 %.o: %.c
 	$(CC) -c $< -o $@ $(CFLAGS_DEBUG) $(CFLAGS)
 
-run: $(O) $(MODEL).bin
+run: $(O) $(MODELS)
 	./$^
 
-debug: $(O) $(MODEL).bin
+debug: $(O) $(MODELS)
 	$(GDB) -ex run --batch --args ./$^
 
 release: $(SRCS)
@@ -46,13 +46,13 @@ dist: release
 	@mkdir -pv dist
 	@cp -v $(O) dist
 
-$(MODEL).blend:
+%.blend:
 	@if [ ! -e $@ ]; then cp -v ../$@ .; fi
 
-$(MODEL).bin: $(MODEL).blend export.py
+%.bin: %.blend export.py
 	blender $< -b -P export.py
 
-indexed-$(MODEL).bin: $(O) $(MODEL).bin
+indexed-%.bin: $(O) %.bin
 	./$^
 
 help:
@@ -65,6 +65,6 @@ help:
 	@echo "debug - Run executable with gdb"
 	@echo "release - Build optimised executable"
 	@echo "dist - Package optimised executable and all local dependencies in a dist directory"
-	@echo "$(MODEL).blend - Copy Blender model from parent directory to this directory"
-	@echo "$(MODEL).bin - Export vertex data from $(MODEL).blend"
-	@echo "indexed-$(MODEL).bin - Convert exported vertex data to indexed vertex data"
+	@echo "<model>.blend - Copy Blender model from parent directory to this directory"
+	@echo "<model>.bin - Export vertex data from <model>.blend"
+	@echo "indexed-<model>.bin - Convert exported vertex data to indexed vertex data"

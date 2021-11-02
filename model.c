@@ -125,7 +125,7 @@ int main(int argc, const char *argv[]) {
 		// Generate the index list by re-looping through all vertices and
 		// finding their match in the vertex index list and storing that index
 		// in the newly-generated index list.
-		const int indexListSize = vertexCount * sizeof(vertex);
+		const int indexListSize = vertexCount * sizeof(unsigned int);
 		unsigned int *indexList = malloc(indexListSize);
 
 		// Loop through vertices...
@@ -136,7 +136,7 @@ int main(int argc, const char *argv[]) {
 
 				// Check if there's a match...
 				for(l = 0; l < 5; l++)
-					if(vertices[i][l] != vertexList[k][l]) {
+					if(vertices[j][l] != vertexList[k][l]) {
 						match = false;
 						break;
 					}

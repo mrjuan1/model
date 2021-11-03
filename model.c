@@ -1,4 +1,5 @@
 #include <malloc.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,7 +9,12 @@
 
 typedef float vertex[5];
 
+const char *failedTo = "Failed to ";
+
 void showUsage(const char *arg0);
+bool saveDimensions(const char *filename,
+					int vertexListLength,
+					vertex *vertexList);
 
 int main(int argc, const char *argv[]) {
 	// Fail if no arguments were provided to the executable.
@@ -31,8 +37,6 @@ int main(int argc, const char *argv[]) {
 	for(i = 1; i < argc; i++) {
 		printf("Indexing vertices in file \"%s\"...", argv[i]);
 		fflush(stdout);
-
-		const char *failedTo = "Failed to ";
 
 		// Read out vertices (whole file).
 		FILE *f = fopen(argv[i], "rb");
@@ -190,12 +194,12 @@ int main(int argc, const char *argv[]) {
 		}
 
 		result = fwrite(vertexList, vertexListSize, 1, f);
-		free(vertexList);
 		if(!result) {
 			fail("write indexed vertex list to output file \"%s\"", name);
 
 			free(name);
 			free(indexList);
+			free(vertexList);
 
 			continue;
 		}
@@ -206,6 +210,7 @@ int main(int argc, const char *argv[]) {
 
 			free(name);
 			free(indexList);
+			free(vertexList);
 
 			continue;
 		}
@@ -214,7 +219,9 @@ int main(int argc, const char *argv[]) {
 		free(indexList);
 		if(!result) {
 			fail("write index to output file \"%s\"", name);
+
 			free(name);
+			free(vertexList);
 
 			continue;
 		}
@@ -222,12 +229,19 @@ int main(int argc, const char *argv[]) {
 		result = fclose(f);
 		if(result) {
 			fail("close output file \"%s\"", name);
+
 			free(name);
+			free(vertexList);
 
 			continue;
 		}
 
 		free(name);
+
+		result = saveDimensions(argv[i], vertexListLength, vertexList);
+		free(vertexList);
+		if(!result) continue;
+
 		printf("done.\n");
 	}
 
@@ -242,4 +256,91 @@ void showUsage(const char *arg0) {
 	printf("Options:");
 	printf("  -h  --help  Show this message\n");
 	printf("\n");
+}
+
+bool saveDimensions(const char *filename,
+					int vertexListLength,
+					vertex *vertexList) {
+	const char *prefix = "dimensions-";
+	const int nameLength = strlen(prefix) + strlen(filename) + 1;
+	char *name = malloc(nameLength);
+	if(!name) {
+		fail("allocate memory for dimensions filename%c", '\0');
+		return false;
+	}
+
+	sprintf(name, "%s%s%c", prefix, filename, '\0');
+	printf("dimensions file \"%s\"...", name);
+	fflush(stdout);
+
+	FILE *f = fopen(name, "wb");
+	if(!f) {
+		fail("open dimensions file \"%s\" for writing", name);
+		free(name);
+
+		return false;
+	}
+
+	float radius = 0.0f;
+	float smallest[3] = { 0.0f, 0.0f, 0.0f };
+	float largest[3] = { 0.0f, 0.0f, 0.0f };
+
+	int i;
+	for(i = 0; i < vertexListLength; i++) {
+		for(int j = 0; j < 3; j++) {
+			const float absoluteVertexValue = fabsf(vertexList[i][j]);
+			if(absoluteVertexValue > radius) radius = absoluteVertexValue;
+
+			if(vertexList[i][j] < smallest[j])
+				smallest[j] = vertexList[i][j];
+			else if(vertexList[i][j] > largest[j])
+				largest[j] = vertexList[i][j];
+		}
+	}
+
+	int result = fwrite((const void *)&radius, sizeof(float), 1, f);
+	if(!result) {
+		fail("write radius to dimensions file \"%s\"", name);
+
+		fclose(f);
+		free(name);
+
+		return false;
+	}
+
+	for(i = 0; i < 3; i++) {
+		result = fwrite((const void *)&smallest[i], sizeof(float), 1, f);
+		if(!result) {
+			fail("write smallest point to dimensions file \"%s\"", name);
+
+			fclose(f);
+			free(name);
+
+			return false;
+		}
+	}
+
+	for(i = 0; i < 3; i++) {
+		result = fwrite((const void *)&largest[i], sizeof(float), 1, f);
+		if(!result) {
+			fail("write largest point to dimensions file \"%s\"", name);
+
+			fclose(f);
+			free(name);
+
+			return false;
+		}
+	}
+
+	result = fclose(f);
+	if(result) {
+		fail("close dimensions file \"%s\"", name);
+		free(name);
+
+		return false;
+	}
+
+	free(name);
+
+	return true;
 }

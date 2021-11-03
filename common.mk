@@ -52,7 +52,7 @@ dist: release
 %.bin: %.blend export.py
 	blender $< -b -P export.py
 
-indexed-%.bin: $(O) %.bin
+indexed-%.bin dimensions-%i.bin: $(O) %.bin
 	./$^
 
 help:
@@ -67,4 +67,4 @@ help:
 	@echo "dist - Package optimised executable and all local dependencies in a dist directory"
 	@echo "<model>.blend - Copy Blender model from parent directory to this directory"
 	@echo "<model>.bin - Export vertex data from <model>.blend"
-	@echo "indexed-<model>.bin - Convert exported vertex data to indexed vertex data"
+	@echo "<indexed|dimensions>-<model>.bin - Convert exported vertex data to indexed vertex data and save model dimensions"
